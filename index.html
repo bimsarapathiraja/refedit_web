@@ -1,258 +1,396 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="RefEdit: A Benchmark and Method for Improving Instruction-based Image Editing Model for Referring Expression">
-  <meta name="keywords" content="RefEdit, Image Editing, Referring Expression">
+    content="RefEdit: A Benchmark and Method for Improving Instruction-based Image Editing Model for Referring Expression">
+  <meta name="keywords" content="RefEdit, Image Editing, Referring Expression, AI, Computer Vision">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nerfies: Deformable Neural Radiance Fields</title>
+  <title>RefEdit: Instruction-based Image Editing</title>
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script> -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#10B981',
+            dark: '#1F2937',
+            light: '#F9FAFB',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Georgia', 'serif'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'fade-in': 'fadeIn 1s ease-in',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            }
+          }
+        }
+      }
     }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-PYVRSFMDRL');
   </script>
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-        rel="stylesheet">
 
-  <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/favicon.svg">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WD9WF3J0SH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+    gtag('config', 'G-WD9WF3J0SH');
+  </script>
+
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .gradient-text {
+      background: linear-gradient(90deg, #4F46E5 0%, #10B981 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .paper-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .paper-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-link {
+      position: relative;
+    }
+
+    .nav-link:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #4F46E5;
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover:after {
+      width: 100%;
+    }
+
+    .author-chip {
+      background-color: rgba(79, 70, 229, 0.1);
+      color: #4F46E5;
+      transition: all 0.3s ease;
+    }
+
+    .author-chip:hover {
+      background-color: rgba(79, 70, 229, 0.2);
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
-<body>
 
-<!-- <nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" href="https://keunhong.com">
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More Research
-        </a>
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="https://hypernerf.github.io">
-            HyperNeRF
-          </a>
-          <a class="navbar-item" href="https://nerfies.github.io">
-            Nerfies
-          </a>
-          <a class="navbar-item" href="https://latentfusion.github.io">
-            LatentFusion
-          </a>
-          <a class="navbar-item" href="https://photoshape.github.io">
-            PhotoShape
-          </a>
+<body class="font-sans bg-light text-dark">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm py-4 sticky top-0 z-50">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+          <span class="text-white font-bold">R</span>
         </div>
+        <span class="font-bold text-xl">RefEdit</span>
       </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="#abstract" class="nav-link font-medium">Abstract</a>
+        <a href="#benchmark" class="nav-link font-medium">Benchmark</a>
+        <a href="#results" class="nav-link font-medium">Results</a>
+        <a href="#bibtex" class="nav-link font-medium">BibTeX</a>
+      </div>
+      <button class="md:hidden text-gray-600">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
     </div>
+  </nav>
 
-  </div>
-</nav> -->
+  <!-- Hero Section -->
+  <section class="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-green-50">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          <span class="gradient-text">RefEdit</span>
+        </h1>
+        <h2 class="text-xl md:text-2xl font-medium text-gray-600 mb-8">
+          A Benchmark and Method for Improving Instruction-based Image Editing Model for Referring Expression
+        </h2>
 
-
-<section class="hero">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">RefEdit: A Benchmark and Method for Improving Instruction-based Image Editing Model for Referring Expression</h1>
-          <div class="is-size-5 publication-authors">
-            <span class="author-block">
-              <a href="https://scholar.google.es/citations?hl=en&user=7ViSGnIAAAAJ">Bimsara Pathiraja</a><sup>*</sup>,</span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=z--mlKgAAAAJ&hl=en&oi=ao">Maitreya Patel</a><sup>*</sup>,</span>
-            <span class="author-block">
-              <a href="https://www.linkedin.com/in/shhivam-singh/">Shivam Singh</a>,
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=k2suuZgAAAAJ&hl=en">Yezhou Yang</a>,
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=9Yd716IAAAAJ&hl=en">Chitta Baral</a>
-            </span>
-          </div>
-
-          <div class="is-size-5 publication-authors">
-            <span class="author-block">Arizona State University</span>
-            <!-- <span class="author-block"><sup>2</sup>Google Research</span> -->
-          </div>
-
-          <div class="column has-text-centered">
-            <div class="publication-links">
-              <!-- PDF Link. -->
-              <span class="link-block">
-                <a href="https://arxiv.org/pdf/2011.12948"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="https://arxiv.org/abs/2011.12948"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>arXiv</span>
-                </a>
-              </span>
-              <!-- Video Link. -->
-              <!-- <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                  </span>
-                  <span>Video</span>
-                </a>
-              </span> -->
-              <!-- Code Link. -->
-              <span class="link-block">
-                <a href="https://github.com/google/nerfies"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                  </a>
-              </span>
-              <!-- Dataset Link. -->
-              <span class="link-block">
-                <a href="https://github.com/google/nerfies/releases/tag/0.1"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="far fa-images"></i>
-                  </span>
-                  <span>Data</span>
-                  </a>
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <a href="https://scholar.google.es/citations?hl=en&user=7ViSGnIAAAAJ">
+            <div class="author-chip px-4 py-2 rounded-full text-sm font-medium flex items-center">
+              <img src="https://ui-avatars.com/api/?name=Bimsara+Pathiraja&background=4F46E5&color=fff"
+                class="w-6 h-6 rounded-full mr-2">
+              <span class="hover:underline">Bimsara Pathiraja*</span>
             </div>
+          </a>
+          <a href="https://maitreyapatel.com">
+            <div class="author-chip px-4 py-2 rounded-full text-sm font-medium flex items-center">
+              <img src="https://ui-avatars.com/api/?name=Maitreya+Patel&background=4F46E5&color=fff"
+                class="w-6 h-6 rounded-full mr-2">
+              <span class="hover:underline">Maitreya Patel*</span>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/shhivam-singh/">
+            <div class="author-chip px-4 py-2 rounded-full text-sm font-medium flex items-center">
+              <img src="https://ui-avatars.com/api/?name=Shivam+Singh&background=4F46E5&color=fff"
+                class="w-6 h-6 rounded-full mr-2">
+              <span class="hover:underline">Shivam Singh</span>
+            </div>
+          </a>
+          <a href="https://yezhouyang.engineering.asu.edu/">
+            <div class="author-chip px-4 py-2 rounded-full text-sm font-medium flex items-center">
+              <img src="https://ui-avatars.com/api/?name=Yezhou+Yang&background=4F46E5&color=fff"
+                class="w-6 h-6 rounded-full mr-2">
+              <span class="hover:underline">Yezhou Yang</span>
+            </div>
+          </a>
+          <a href="https://scholar.google.com/citations?user=9Yd716IAAAAJ&hl=en">
+            <div class="author-chip px-4 py-2 rounded-full text-sm font-medium flex items-center">
+              <img src="https://ui-avatars.com/api/?name=Chitta+Baral&background=4F46E5&color=fff"
+                class="w-6 h-6 rounded-full mr-2">
+              <span class="hover:underline">Chitta Baral</span>
+            </div>
+          </a>
+        </div>
 
+        <div class="text-gray-500 mb-8">Arizona State University</div>
+
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#" class="paper-card px-6 py-3 rounded-lg flex items-center">
+            <i class="fas fa-file-pdf text-primary mr-2"></i>
+            <span>Paper</span>
+          </a>
+          <a href="#" class="paper-card px-6 py-3 rounded-lg flex items-center">
+            <i class="fas fa-book text-primary mr-2"></i>
+            <span>arXiv</span>
+          </a>
+          <a href="#" class="paper-card px-6 py-3 rounded-lg flex items-center">
+            <i class="fas fa-code text-primary mr-2"></i>
+            <span>Code</span>
+          </a>
+          <a href="#" class="paper-card px-6 py-3 rounded-lg flex items-center">
+            <i class="fas fa-play text-primary mr-2"></i>
+            <span>Demo</span>
+          </a>
+          <a href="#" class="paper-card px-6 py-3 rounded-lg flex items-center">
+            <i class="fas fa-database text-primary mr-2"></i>
+            <span>Data</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser Section -->
+  <section class="py-16 bg-white" id="teaser">
+    <div class="container mx-auto px-6">
+      <div class="max-w-5xl mx-auto">
+        <div class="paper-card p-6 rounded-xl">
+          <img src="./static/images/eval_page-0001.jpg" alt="Evaluation Results"
+            class="rounded-lg w-full h-auto shadow-md">
+          <div class="mt-4 text-gray-600">
+            <span class="font-bold text-primary">Figure 1:</span> RefEdit is a referring expression-based
+            image editing benchmark and a finetuned model. Our proposed RefEdit model can accurately
+            identify the entity of interest and perform accurate edits.
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <figure>
-        <img id="teaser" src="./static/images/eval_page-0001.jpg" alt="Evaluation Results" style="width: 100%; height: auto;">
-        <figcaption class="content has-text-justified"><b>Figure 1: </b> RefEdit is a referring expression-based image editing benchmark and a finetuned model. Our proposed RefEdit model can
-          accurately identify the entity of interest and perform accurate edits.</figcaption>
-      </figure>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          Despite recent advances in inversion and instruction-based image editing, existing approaches primarily excel at editing single, prominent objects but significantly struggle when applied to complex scenes containing multiple entities. To quantify this gap, we first introduce RefEdit-Bench, a rigorous real-world benchmark rooted in RefCOCO, where even baselines trained on millions of samples perform poorly. To overcome this limitation, we introduce RefEdit -- an instruction-based editing model trained on our scalable synthetic data generation pipeline. Our RefEdit, trained on only 20,000 editing triplets, outperforms the Flux/SD3 model-based baselines trained on millions of data. Extensive evaluations across various benchmarks demonstrate that our model not only excels in referring expression tasks but also enhances performance on traditional benchmarks, achieving state-of-the-art results comparable to closed-source methods. We will release our code, data, and checkpoints.
+  <!-- Abstract Section -->
+  <section class="py-16 bg-gray-50" id="abstract">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold mb-8 text-center">
+          <span class="border-b-4 border-primary pb-2">Abstract</span>
+        </h2>
+        <div class="paper-card p-8 rounded-xl">
+          <p class="text-gray-700 leading-relaxed">
+            Despite recent advances in inversion and instruction-based image editing, existing approaches
+            primarily excel at editing single, prominent objects but significantly struggle when applied to
+            complex scenes containing multiple entities. To quantify this gap, we first introduce
+            RefEdit-Bench, a rigorous real-world benchmark rooted in RefCOCO, where even baselines trained
+            on millions of samples perform poorly. To overcome this limitation, we introduce RefEdit — an
+            instruction-based editing model trained on our scalable synthetic data generation pipeline. Our
+            RefEdit, trained on only 20,000 editing triplets, outperforms the Flux/SD3 model-based baselines
+            trained on millions of data. Extensive evaluations across various benchmarks demonstrate that
+            our model not only excels in referring expression tasks but also enhances performance on
+            traditional benchmarks, achieving state-of-the-art results comparable to closed-source methods.
+            We will release our code, data, and checkpoints.
+          </p>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="section">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">RefEdit-Bench</h2>
-        <div class="hero-body">
-          <figure>
-            <img id="teaser" src="./static/images/refeditbench2.png" alt="Evaluation Results" style="width: 100%; height: auto;">
-            <figcaption class="content has-text-justified"><b>Figure 2: </b> Three samples from each of Easy and Hard categories and the overlayed mask of the interested object are shown.</figcaption>
-          </figure>
-        </div>
-        <div class="hero-body">
-          <figure>
-            <img id="teaser" src="./static/images/comp3_page-0001.jpg" alt="Evaluation Results" style="width: 100%; height: auto;">
-            <figcaption class="content has-text-justified"><b>Figure 3: </b>Qualitative results on image editing. The top 3 samples are from the Easy category and the bottom 3 samples are from the Hard
-              category. As illustrated, our method attains the SOTA performance on comparison of all the methods.</figcaption>
-          </figure>
+  <!-- Benchmark Section -->
+  <section class="py-16 bg-white" id="benchmark">
+    <div class="container mx-auto px-6">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-3xl font-bold mb-8 text-center">
+          <span class="border-b-4 border-secondary pb-2">RefEdit-Bench</span>
+        </h2>
+
+        <div class="paper-card p-6 rounded-xl mb-12">
+          <img src="./static/images/refeditbench2.png" alt="Benchmark Examples"
+            class="rounded-lg w-full h-auto shadow-md">
+          <div class="mt-4 text-gray-600">
+            <span class="font-bold text-primary">Figure 2:</span> Three samples from each of Easy and Hard
+            categories and the overlayed mask of the interested object are shown.
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
 
-<section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@article{pathiraja2023refedit,
+
+  <section class="py-16 bg-white" id="results">
+    <div class="container mx-auto px-6">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-3xl font-bold mb-8 text-center">
+          <span class="border-b-4 border-secondary pb-2">Results</span>
+        </h2>
+
+        <div class="paper-card p-6 rounded-xl">
+          <img src="./static/images/comp3_page-0001.jpg" alt="Evaluation Results"
+            class="rounded-lg w-full h-auto shadow-md">
+          <div class="mt-4 text-gray-600">
+            <span class="font-bold text-primary">Figure 3:</span> Qualitative results on image
+            editing. The
+            top 3 samples are from the Easy category and the bottom 3 samples are from the Hard
+            category. As
+            illustrated, our method attains the SOTA performance on comparison of all the
+            methods.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BibTeX Section -->
+  <section class="py-16 bg-gray-50" id="bibtex">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold mb-8 text-center">
+          <span class="border-b-4 border-primary pb-2">BibTeX</span>
+        </h2>
+        <div class="paper-card p-6 rounded-xl overflow-hidden">
+          <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>@article{pathiraja2025refedit,
     title={RefEdit: A Benchmark and Method for Improving Instruction-based Image Editing Model for Referring Expression},
     author={Pathiraja, Bimsara and Patel, Maitreya and Singh, Shivam and Yang, Yezhou and Baral, Chitta},
-    journal={arXiv preprint arXiv:2309.12345},
+    journal={arXiv preprint arXiv:TBD},
     year={2025}
-  }</code></pre>
-  </div>
-</section>
-
-
-<footer class="footer">
-  <div class="container">
-    <div class="content has-text-centered">
-      <a class="icon-link"
-         href="#">
-        <i class="fas fa-file-pdf"></i>
-      </a>
-      <a class="icon-link" href="https://github.com/bimsarapathiraja" class="external-link" disabled>
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          This website template is taken from <a href="https://nerfies.github.io" target="_blank">Nerfies</a> and modified by <a href="https://github.com/bimsarapathiraja" target="_blank">Bimsara Pathiraja</a>.
+}</code></pre>
         </div>
       </div>
     </div>
-  </div>
-</footer>
+  </section>
 
+  <!-- Footer -->
+  <footer class="py-12 bg-dark text-white">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+              <span class="text-white font-bold">R</span>
+            </div>
+            <span class="font-bold text-xl">RefEdit</span>
+          </div>
+          <p class="text-gray-400 mt-2 text-sm">Arizona State University</p>
+        </div>
+
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fab fa-github text-xl"></i>
+          </a>
+          <a href="mailto:maitreya.patel@asu.edu" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fas fa-envelope text-xl"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+        <p>This website template is inspired by <a href="https://nerfies.github.io"
+            class="text-primary hover:underline">Nerfies</a> and modified by <a
+            href="https://github.com/bimsarapathiraja" class="text-primary hover:underline">Bimsara
+            Pathiraja</a> and <a href="https:maitreyapatel.com" class="text-primary hover:underline">Maitreya Patel</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <button id="back-to-top"
+    class="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white shadow-lg hidden items-center justify-center">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Back to top button
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopButton.classList.remove('hidden');
+        backToTopButton.classList.add('flex');
+      } else {
+        backToTopButton.classList.add('hidden');
+        backToTopButton.classList.remove('flex');
+      }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
 </body>
+
 </html>
